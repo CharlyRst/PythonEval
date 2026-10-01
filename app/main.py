@@ -44,8 +44,6 @@ class StationPatch(BaseModel):
 def health() :
     return {"status" : "ok"}
 
-# ------------- POST et GET de stations -------------
-
 @app.post("/stations", status_code=201)
 def post_stations(payload: StationCreate, db: Session = Depends(get_db)) -> StationOut :
     station = Station(**payload.model_dump())
@@ -58,15 +56,12 @@ def post_stations(payload: StationCreate, db: Session = Depends(get_db)) -> Stat
     db.refresh(station)
     return station
 
-
 @app.get("/stations")
 def list_stations(status: StationStatus | None = None, db: Session = Depends(get_db)) -> list[StationOut]:
     station = select(Station)
     if status is not None:
         station = station.where(Station.status == status)
     return list(db.scalars(station).all())
-
-# ------------- GET et PATCH de stations{id} -------------
 
 @app.get("/stations/{station_id}")
 def get_station(station_id: int, db: Session = Depends(get_db)) -> StationOut:
